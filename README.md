@@ -12,8 +12,8 @@
 
 ![捕捉-1gsr](https://github.com/user-attachments/assets/cb13dcbd-d4bb-4a44-8440-fee5a662aa17)
 
+![捕edwse捉-3](https://github.com/user-attachments/assets/9d8cdfa3-0c41-415b-ba4d-2898b350748f)
 
-<img width="659" height="400" alt="image" src="https://github.com/user-attachments/assets/1d2a7bb3-2b14-4b4d-9f5a-b1ade7a84545" />
 
 初始陌生度: 3 //意思是只要点三次“记得”，这个词就不再出现
 
