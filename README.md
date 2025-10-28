@@ -10,7 +10,8 @@
 
 这个想法源于一个早期的背单词软件，可惜我已经忘记它的名字了，在此向原作者致歉。不过这种记单词的方法确实非常高效
 
-<img width="683" height="781" alt="image" src="https://github.com/user-attachments/assets/9374538b-7845-434b-9ee7-8cf014c3741c" />
+![捕捉-1gsr](https://github.com/user-attachments/assets/cb13dcbd-d4bb-4a44-8440-fee5a662aa17)
+
 
 <img width="659" height="400" alt="image" src="https://github.com/user-attachments/assets/1d2a7bb3-2b14-4b4d-9f5a-b1ade7a84545" />
 
