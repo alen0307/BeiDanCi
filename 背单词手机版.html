@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>背单词 - 设置面板版</title>
+  <style>
+  .l{
+    display: block;
+    font-size:1em !important;
+  }
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 15px;
+      background-color: #fafafa;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .line1 {
+      display: block;
+      margin: 0px 0px 0px 0px ;
+    }
+    #settingsBtn{
+    width:200px;
+      margin: 0px 50px 0px 0px;
+    }
+    #fileInput{
+      margin:0px;
+      width:200px;
+    }
+    #groupSelect{
+      width:130px;
+    }
+    .autoP{
+    display: block;
+    }
+    #settingsPanel {
+      display: none;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin: 15px 0;
+    }
+    .setting-row {
+      margin: 10px 0;
+    }
+    .setting-row label {
+      display: inline-block;
+      width: 140px;
+      font-weight: bold;
+    }
+    .setting-row input {
+      width: 80px;
+      padding: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .btn-setting {
+      padding: 6px 6px;
+      margin:  0;
+      font-size: 0.9em;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .btn-delete { background: #ff9800; color: white; }
+    .btn-export { background: #673ab7; color: white; }
+    .btn-confirm { background: #4CAF50; color: white; }
+ 
+    #wordDisplay {
+      font-size: 1.8em;
+      text-align: center;
+      margin: 10px 0;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      line-height: 1.4;
+    }
+    #meaningDisplay {
+      font-size: 1.0em;
+      text-align: left;
+      margin: 5px 0;
+      padding: 5px;
+      background: #f9f9f9;
+      border-radius: 6px;
+      min-height: 350px;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.2s;
+      white-space: normal;
+      word-wrap: break-word;
+      max-height: 350px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    #meaningDisplay.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    #buttonArea {
+      min-height: 60px;
+      text-align: center;
+      margin: 20px 0;
+    }
+    #wordDisplay .phonetic {
+      color: #d93025;
+      font-size: 0.6em;
+      margin-top: 6px;
+      display: block;
+    }
+    .btn-pronounce { background: #9c27b0; color: white; }
+    .btn {
+      padding: 8px 16px;
+      margin: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .btn-remember { background: #4CAF50; color: white; }
+    .btn-forget { background: #f44336; color: white; }
+    .btn-correct { background: #2196F3; color: white; }
+    .btn-wrong { background: #FF9800; color: white; }
+    .btn-next { background: #9E9E9E; color: white; }
+    #debugPanel {
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 0.9em;
+      background: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    #debugPanel pre {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>背单词练习</h1>
+  <div class="line1">
+  <input type="file" id="fileInput" accept=".json"><select id="groupSelect"></select><div>
+  <button id="settingsBtn" >设置</button><input type="checkbox" id="autoPronounce" checked=true ><label >自动发音</label></div></div>
+  
+  <!-- 设置面板 -->
+  <div id="settingsPanel">
+    <div class="setting-row">
+      <label>初始陌生度:</label>
+      <input type="number" id="initDifficulty" min="1" value="3">
+    </div>
+    <div class="setting-row">
+      <label>初始冷却值:</label>
+      <input type="number" id="initInterval" min="0" value="7">
+    </div>
+    <div class="setting-row">
+      <label>每组单词数:</label>
+      <input type="number" id="groupSize" min="10" value="100">
+    </div>
+    <div class="setting-row">
+      <label>难词门槛:</label>
+      <input type="number" id="hardThreshold" min="1" value="7">
+    </div>
+    <div class="setting-row">
+      <button id="clearProgressBtn" class="btn-setting btn-delete">删除本组记录</button>
+      <button id="exportHardWordsBtn" class="btn-setting btn-export">导出难词词库</button>
+      <button id="confirmSettingsBtn" class="btn-setting btn-confirm">确定修改</button>
+    </div>
+  </div>
+
+
+  
+  <div id="wordDisplay">请加载词库文件</div>
+  <div id="meaningDisplay"></div>
+  <div id="buttonArea">
+    <button id="btnPronounce" class="btn btn-pronounce">发音</button>
+    <button id="btnRemember" class="btn btn-remember">记得</button>
+    <button id="btnForget" class="btn btn-forget">不记得</button>
+    <button id="btnCorrect" class="btn btn-correct">正确</button>
+    <button id="btnWrong" class="btn btn-wrong">错误</button>
+    <button id="btnNext" class="btn btn-next">下一个单词</button>
+  </div>
+  <div id="debugPanel">
+    <h3>学习记录（格式：序号 单词: 陌生度: 冷却值）</h3>
+    <pre>（空）</pre>
+  </div>
+  <script>
+    let fullWords = [];
+    let words = [];
+    let progress = {};
+    let currentWordIndex = -1;
+    let currentGroup = -1;
+    let autoPronounce=true ; // 新增：自动发音开关
+    const STORAGE_KEY = 'vocabulary_json_grouped_v1';
+    const HARD_WORDS_KEY = 'vocabulary_hard_words_v1';
+    
+    // 默认参数（可被设置面板覆盖）
+    let config = {
+      initDifficulty: 3,
+      initInterval: 7,
+      groupSize: 100,
+      hardThreshold: 7
+    };
+
+    // 从 localStorage 加载配置
+    function loadConfig() {
+      const saved = localStorage.getItem('vocabulary_config');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          config = { ...config, ...data };
+        } catch (e) {
+          console.warn('配置加载失败', e);
+        }
+      }
+      updateConfigUI();
+    }
+
+    // 保存配置到 localStorage
+    function saveConfig() {
+      localStorage.setItem('vocabulary_config', JSON.stringify(config));
+    }
+
+    // 更新设置面板的 UI 值
+    function updateConfigUI() {
+      document.getElementById('initDifficulty').value = config.initDifficulty;
+      document.getElementById('initInterval').value = config.initInterval;
+      document.getElementById('groupSize').value = config.groupSize;
+      document.getElementById('hardThreshold').value = config.hardThreshold;
+    }
+
+    // 全局冷却减1函数
+    function decrementOtherIntervals(currentIndex) {
+      for (let j = 0; j < words.length; j++) {
+        if (j !== currentIndex && progress[j] && progress[j].interval > 0) {
+          progress[j].interval -= 1;
+        }
+      }
+    }
+
+    // 操作函数
+    function handleRemember() {
+      document.getElementById('meaningDisplay').innerHTML = words[currentWordIndex].html;
+      document.getElementById('meaningDisplay').classList.add('show');
+      showStage2a();
+    }
+
+    function handleForget() {
+      document.getElementById('meaningDisplay').innerHTML = words[currentWordIndex].html;
+      document.getElementById('meaningDisplay').classList.add('show');
+      showStage2b();
+    }
+
+    function handleCorrect() {
+      decrementOtherIntervals(currentWordIndex);
+      progress[currentWordIndex].difficulty = Math.max(0, progress[currentWordIndex].difficulty - 1);
+      progress[currentWordIndex].interval = config.initInterval;
+      saveProgress();
+      nextWord();
+    }
+
+    function handleWrong() {
+      decrementOtherIntervals(currentWordIndex);
+      progress[currentWordIndex].difficulty += 1;
+      progress[currentWordIndex].interval = config.initInterval;
+      saveProgress();
+      nextWord();
+    }
+
+    function handleNextAfterForget() {
+      decrementOtherIntervals(currentWordIndex);
+      progress[currentWordIndex].difficulty += 1;
+      progress[currentWordIndex].interval = config.initInterval;
+      saveProgress();
+      nextWord();
+    }
+
+    // 发音函数
+    function pronounceWord(word) {
+      if (!window.speechSynthesis) {
+        alert('您的浏览器不支持语音朗读功能');
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'en-GB';
+      utterance.rate = 0.9;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    }
+
+    // 添加难词
+    function addToHardWords(wordData) {
+      let hardList = JSON.parse(localStorage.getItem(HARD_WORDS_KEY) || '[]');
+      if (!hardList.some(item => item.word === wordData.word)) {
+        hardList.push(wordData);
+        localStorage.setItem(HARD_WORDS_KEY, JSON.stringify(hardList));
+      }
+    }
+
+    // 导出难词
+    function exportHardWords() {
+      const hardWords = JSON.parse(localStorage.getItem(HARD_WORDS_KEY) || '[]');
+      if (hardWords.length === 0) {
+        alert('暂无难词记录');
+        return;
+      }
+      const dataStr = JSON.stringify(hardWords, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'hard_words_vocab.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // 清除当前组记录
+    function clearCurrentProgress() {
+      if (currentGroup === -1 || words.length === 0) {
+        alert('请先选择分组');
+        return;
+      }
+      if (confirm('确定要删除本组的学习记录吗？')) {
+        const key = getStorageKey();
+        localStorage.removeItem(key);
+        progress = {};
+        currentWordIndex = -1;
+        updateDebugPanel();
+        nextWord();
+        alert('本组学习记录已清除');
+      }
+    }
+
+    // 按钮事件绑定
+    document.addEventListener('DOMContentLoaded', () => {
+      // 主按钮
+      document.getElementById('btnRemember').onclick = handleRemember;
+      document.getElementById('btnForget').onclick = handleForget;
+      document.getElementById('btnCorrect').onclick = handleCorrect;
+      document.getElementById('btnWrong').onclick = handleWrong;
+      document.getElementById('btnNext').onclick = handleNextAfterForget;
+      
+      document.getElementById('btnPronounce').onclick = () => {
+        if (currentWordIndex !== -1 && words[currentWordIndex]) {
+          pronounceWord(words[currentWordIndex].word);
+        }
+      };
+      
+      // 设置面板
+      document.getElementById('settingsBtn').onclick = () => {
+        const panel = document.getElementById('settingsPanel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      };
+      
+      document.getElementById('confirmSettingsBtn').onclick = () => {
+        // 读取输入值
+        config.initDifficulty = parseInt(document.getElementById('initDifficulty').value) || 3;
+        config.initInterval = parseInt(document.getElementById('initInterval').value) || 7;
+        config.groupSize = parseInt(document.getElementById('groupSize').value) || 100;
+        config.hardThreshold = parseInt(document.getElementById('hardThreshold').value) || 7;
+        
+        // 保存并关闭
+        saveConfig();
+        loadConfig();
+        document.getElementById('settingsPanel').style.display = 'none';
+        
+        alert('设置已保存');
+      };
+      
+      document.getElementById('clearProgressBtn').onclick = clearCurrentProgress;
+      document.getElementById('exportHardWordsBtn').onclick = exportHardWords;
+      
+      // 分组
+     document.getElementById('groupSelect').addEventListener('change', e => {
+  const groupIndex = parseInt(e.target.value, 10);
+  loadGroup(groupIndex);
+});
+      
+      // 加载配置
+      loadConfig();
+    });
+
+    // 加载词库
+    document.getElementById('fileInput').addEventListener('change', loadFile);
+
+    function loadFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          fullWords = JSON.parse(e.target.result);
+          if (!Array.isArray(fullWords) || fullWords.length === 0) {
+            throw new Error('无效的词库格式');
+          }
+          if (!fullWords[0].hasOwnProperty('word')) {
+            throw new Error('词库缺少 "word" 字段');
+          }
+          initGroupSelector();
+        } catch (err) {
+          alert('词库加载失败！\n错误: ' + err.message);
+          fullWords = [];
+        }
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+// 自动发音控制 - 即时控制，不保存状态
+      document.getElementById('autoPronounce').onchange = (e) => {
+        autoPronounce = e.target.checked;
+      };
+    function initGroupSelector() {
+      const groupSelect = document.getElementById('groupSelect');
+      groupSelect.innerHTML = '';
+      const totalGroups = Math.ceil(fullWords.length / config.groupSize);
+      for (let i = 0; i < totalGroups; i++) {
+        const start = i * config.groupSize + 1;
+        const end = Math.min((i + 1) * config.groupSize, fullWords.length);
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `第 ${i + 1} 组 (${start}-${end})`;
+        groupSelect.appendChild(option);
+      }
+      //document.getElementById('groupSelector').style.display = 'block';
+      groupSelect.selectedIndex = 0;          // 选中第一项
+  groupSelect.dispatchEvent(new Event('change'));
+    }
+
+    function loadGroup(groupIndex) {
+      const totalGroups = Math.ceil(fullWords.length / config.groupSize);
+      if (groupIndex < 0 || groupIndex >= totalGroups) {
+        alert('无效的分组');
+        return;
+      }
+      currentGroup = groupIndex;
+      const start = groupIndex * config.groupSize;
+      const end = Math.min(start + config.groupSize, fullWords.length);
+      words = fullWords.slice(start, end);
+      currentWordIndex = -1;
+      loadProgress();
+      nextWord();
+    }
+
+    function getStorageKey() {
+      return `${STORAGE_KEY}_group${currentGroup}`;
+    }
+
+    function loadProgress() {
+      if (currentGroup === -1) {
+        progress = {};
+        return;
+      }
+      progress = {};
+      const saved = localStorage.getItem(getStorageKey());
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data.wordsCount === words.length) {
+            progress = data.progress || {};
+          }
+        } catch (e) {
+          console.warn('进度加载失败', e);
+        }
+      }
+      updateDebugPanel();
+    }
+
+    function saveProgress() {
+      if (currentGroup === -1) return;
+      const data = {
+        wordsCount: words.length,
+        progress: progress
+      };
+      localStorage.setItem(getStorageKey(), JSON.stringify(data));
+
+      // 检查难词
+      for (let i = 0; i < words.length; i++) {
+        if (progress[i] && progress[i].difficulty > config.hardThreshold) {
+          addToHardWords(words[i]);
+        }
+      }
+
+      updateDebugPanel();
+    }
+
+function nextWord() {
+  if (words.length === 0) {
+    document.getElementById('wordDisplay').textContent = '请先选择分组';
+    const meaningEl = document.getElementById('meaningDisplay');
+    meaningEl.innerHTML = '';
+    meaningEl.classList.remove('show');
+    showNoButtons();
+    return;
+  }
+
+  // 第一步：找 interval == 0 且未掌握的单词（正常流程）
+  for (let i = 0; i < words.length; i++) {
+    if (progress[i] === undefined) {
+      progress[i] = { difficulty: config.initDifficulty, interval: 0 };
+    }
+
+    const p = progress[i];
+    if (p.difficulty === 0) continue; // 已掌握跳过
+    if (p.interval > 0) continue;     // 冷却中跳过
+
+    // 找到可学单词
+    const wordtext = words[i].word;
+    const phonetext = words[i].phone || '';
+    const displayHTML = phonetext 
+      ? `${wordtext}<br><span class="phonetic">${phonetext}</span>` 
+      : wordtext;
+    
+    document.getElementById('wordDisplay').innerHTML = displayHTML;
+    const meaningEl = document.getElementById('meaningDisplay');
+    meaningEl.innerHTML = '';
+    meaningEl.classList.remove('show');
+    showStage1(i);
+    return;
+  }
+
+  // 第二步：检查是否还有未掌握的单词（difficulty > 0）
+  let hasUnmastered = false;
+  for (let i = 0; i < words.length; i++) {
+    const p = progress[i] || { difficulty: config.initDifficulty, interval: 0 };
+    if (p.difficulty > 0) {
+      hasUnmastered = true;
+      break;
+    }
+  }
+
+  if (!hasUnmastered) {
+    // 所有单词都已掌握 → 真正结束
+    document.getElementById('wordDisplay').textContent = '✅ 本组所有单词已掌握！';
+    const meaningEl = document.getElementById('meaningDisplay');
+    meaningEl.innerHTML = '';
+    meaningEl.classList.remove('show');
+    showNoButtons();
+    return;
+  }
+
+  // 第三步：有未掌握词但都在冷却中 → 从【已掌握】单词中随机选一个唤醒
+  let masteredIndices = [];
+  for (let i = 0; i < words.length; i++) {
+    const p = progress[i] || { difficulty: config.initDifficulty, interval: 0 };
+    if (p.difficulty === 0) {
+      masteredIndices.push(i);
+    }
+  }
+
+  if (masteredIndices.length > 0) {
+    // 随机选一个已掌握的单词，设为 difficulty=1, interval=0
+    const randomIndex = masteredIndices[Math.floor(Math.random() * masteredIndices.length)];
+    progress[randomIndex] = { difficulty: 1, interval: 0 };
+    saveProgress(); 
+
+    const wordtext = words[randomIndex].word;
+    const phonetext = words[randomIndex].phone || '';
+    const displayHTML = phonetext 
+      ? `${wordtext}<br><span class="phonetic">${phonetext}</span>` 
+      : wordtext;
+    
+    document.getElementById('wordDisplay').innerHTML = displayHTML;
+    const meaningEl = document.getElementById('meaningDisplay');
+    meaningEl.innerHTML = '';
+    meaningEl.classList.remove('show');
+    showStage1(randomIndex);
+    return;
+  }
+
+  // 极端情况：没有已掌握词（理论上不会发生，但安全兜底）
+  // 从所有未掌握词中随机选一个强制学习
+  let unmasteredIndices = [];
+  for (let i = 0; i < words.length; i++) {
+    if ((progress[i] || { difficulty: 1 }).difficulty > 0) {
+      unmasteredIndices.push(i);
+    }
+  }
+  if (unmasteredIndices.length > 0) {
+    const randomIndex = unmasteredIndices[Math.floor(Math.random() * unmasteredIndices.length)];
+    progress[randomIndex].interval = 0;
+    const wordtext = words[randomIndex].word;
+    const phonetext = words[randomIndex].phone || '';
+    const displayHTML = phonetext 
+      ? `${wordtext}<br><span class="phonetic">${phonetext}</span>` 
+      : wordtext;
+    document.getElementById('wordDisplay').innerHTML = displayHTML;
+    const meaningEl = document.getElementById('meaningDisplay');
+    meaningEl.innerHTML = '';
+    meaningEl.classList.remove('show');
+    showStage1(randomIndex);
+  }
+}
+
+    function showStage1(index) {
+      currentWordIndex = index;
+      document.getElementById('btnRemember').style.display = 'inline-block';
+      document.getElementById('btnForget').style.display = 'inline-block';
+      document.getElementById('btnCorrect').style.display = 'none';
+      document.getElementById('btnWrong').style.display = 'none';
+      document.getElementById('btnNext').style.display = 'none';
+      if (autoPronounce && currentWordIndex !== -1 && words[currentWordIndex]) {
+        pronounceWord(words[currentWordIndex].word);
+      }
+    }
+
+    function showStage2a() {
+      document.getElementById('btnRemember').style.display = 'none';
+      document.getElementById('btnForget').style.display = 'none';
+      document.getElementById('btnCorrect').style.display = 'inline-block';
+      document.getElementById('btnWrong').style.display = 'inline-block';
+      document.getElementById('btnNext').style.display = 'none';
+    }
+
+    function showStage2b() {
+      document.getElementById('btnRemember').style.display = 'none';
+      document.getElementById('btnForget').style.display = 'none';
+      document.getElementById('btnCorrect').style.display = 'none';
+      document.getElementById('btnWrong').style.display = 'none';
+      document.getElementById('btnNext').style.display = 'inline-block';
+    }
+
+    function showNoButtons() {
+      document.getElementById('btnRemember').style.display = 'none';
+      document.getElementById('btnForget').style.display = 'none';
+      document.getElementById('btnCorrect').style.display = 'none';
+      document.getElementById('btnWrong').style.display = 'none';
+      document.getElementById('btnNext').style.display = 'none';
+    }
+
+    function updateDebugPanel() {
+      const panel = document.querySelector('#debugPanel pre');
+      if (Object.keys(progress).length === 0) {
+        panel.textContent = '（空）';
+        return;
+      }
+
+      let text = '';
+      const sortedKeys = Object.keys(progress).sort((a, b) => parseInt(a) - parseInt(b));
+      for (const key of sortedKeys) {
+        const p = progress[key];
+        if (p.difficulty > 0) {
+          const wordText = words[key] ? words[key].word : '未知单词';
+          text += `${key} ${wordText}: ${p.difficulty}: ${p.interval}\n`;
+        }
+      }
+
+      panel.textContent = text.trim() || '（无待学单词）';
+    }
+  </script>
+</body>
+</html>
